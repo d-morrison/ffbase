@@ -84,7 +84,31 @@ save.ffdf <- function(..., dir="./ffdb", clone=FALSE, relativepath=TRUE){
 #' @seealso \code{\link{load.ffdf}} \code{\link{save.ffdf}} 
 #' @export
 move.ffdf <- function(x, dir=".", name=as.character(substitute(x)), relativepath=FALSE){  
-  dir.create(dir, showWarnings=FALSE, recursive=TRUE)
+    
+    {# check for duplicated colnames
+    
+        duplicated_indicator = duplicated(toupper(names(x)))
+        
+        duplicated_indicator2 = duplicated(toupper(names(x)), fromLast= T)
+        
+        if(any(duplicated_indicator)) 
+        {
+            
+            message("Unless the filesystem is case-sensitive, this dataset will lose variables due to name duplication:\n")
+        
+            print(head(names(x)[duplicated_indicator | duplicated_indicator2], 50))
+            
+            if(sum(duplicated_indicator | duplicated_indicator2,na.rm=T)>50)
+            {
+                message("\n(First 50 duplicate variable names printed.)\n")
+            }
+            
+        }
+    
+    }
+
+    dir.create(dir, showWarnings=FALSE, recursive=TRUE)
+    
   for (colname in names(x)){
     ffcol <- x[[colname]]
     
